@@ -30,8 +30,6 @@ class Maze():
                 maze[px][py] = player
                 player_location = (px, py)
                 break
-                
-        
         while True:
             gx = random.randrange(1, maze_size, 2)
             gy = random.randrange(1, maze_size, 2)
