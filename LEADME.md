@@ -12,7 +12,8 @@
         1. 1은 길<sub>path</sub>
         1. 2는 플레이어<sub>PP : Player</sub>
         1. 3은 목적지<sub>GG : Goal</sub>
-2.
+2. 상향식 접근
+
 
 ## 연구 결과
 
