@@ -45,6 +45,9 @@ class Maze:
 
 DIRECTIONS = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
+def manhattan_distance(x1, y1, x2, y2):
+    return abs(x1 - x2) + abs(y1 - y2)
+
 def get_opposite(d):
     return (-d[0], -d[1])
 
@@ -84,21 +87,20 @@ class Drone:
                 env.move(self, back_dir)
             return
 
+        # 1. 뚫려있는 길 탐색 (기존과 동일)
         came_from = self.memory.get('came_from')
         open_dirs = []
         for d in DIRECTIONS:
             if d != came_from and env.can_move(self.x, self.y, d):
                 open_dirs.append(d)
 
-        if len(open_dirs) == 0:
-            if len(self.memory['missed_branches']) > 0:
-                self.memory['is_backtracking'] = True
-                back_dir = self.memory['backtrack_path'].pop()
-                env.move(self, back_dir)
-            else:
-                self.active = False
-            return
+        # 막다른 길 처리 로직... (기존과 동일)
 
+        # 💡 2. 휴리스틱 판단: 보물과 가까워지는 순서대로 방향 정렬
+        gx, gy = env.goal_location
+        open_dirs.sort(key=lambda d: manhattan_distance(self.x + d[0]*2, self.y + d[1]*2, gx, gy))
+
+        # 3. 분기점 처리 로직 (기존과 동일)
         for d in open_dirs[1:]:
             # 자식 드론이 태어날 위치를 이미 할당받은 길 방향으로 1칸(실제 배열상 2칸) 전진시킴
             new_x = self.x + d[0] * 2
