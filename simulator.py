@@ -111,7 +111,6 @@ class Simulator:
         return {
             "Seed": self.seed_value,
             "Spawn_Strategy": self.strategy_name,
-            "Algorithm": "Heuristic_DFS",
             "Goal_X": self.goal_location[0],
             "Goal_Y": self.goal_location[1],
             "Optimal_Tick": self.optimal_path_distance,

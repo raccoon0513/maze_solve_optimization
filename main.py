@@ -22,15 +22,12 @@ if __name__ == "__main__":
     n = 32                 
     max_limit = 32         
     
-    # 2가지 전략 비교 설정
-    strategies = [
-        {"name": "Single_Spawn", "count": 1},
-        {"name": "Quad_Spawn", "count": 4}
-    ]
+    # 1, 2, 4, 8, 16, 32 단위로 테스트하는 전략 리스트
+    strategies = [{"name": f"{i}_Spawn", "count": i} for i in [1, 2, 4, 8, 16, 32]]
     
     csv_filename = "simulation_results.csv"
     fieldnames = [
-        "Seed", "Spawn_Strategy", "Algorithm", "Goal_X", "Goal_Y", 
+        "Seed", "Spawn_Strategy", "Goal_X", "Goal_Y", 
         "Optimal_Tick", "Used_Tick", "Map_Coverage_%", 
         "Spawn_Fail_Count", "Backtrack_Count", "Total_Spawned", "Success"
     ]
