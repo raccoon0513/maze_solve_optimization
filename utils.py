@@ -9,7 +9,6 @@ def get_opposite(d):
     return (-d[0], -d[1])
 
 def get_maze_path_distance(maze_data, start_loc, goal_loc):
-    """BFS를 이용해 실제 미로 경로상의 최단 물리 거리를 구합니다."""
     queue = deque([(start_loc[0], start_loc[1], 0)])
     visited = set()
     visited.add((start_loc[0], start_loc[1]))
