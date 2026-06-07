@@ -1,15 +1,26 @@
 import sys
 import random
 import csv
+import os
+import threading
 from maze import Maze
 from simulator import Simulator
 
 sys.setrecursionlimit(10000)
 
+# 전역 종료 플래그
+keep_running = True
+
+def wait_for_exit():
+    """백그라운드에서 사용자의 입력을 대기하는 함수"""
+    global keep_running
+    input()  # 사용자가 Enter를 누를 때까지 대기
+    keep_running = False
+    print("\n\n🛑 종료 신호 접수됨: 현재 진행 중인 미로 탐색까지만 완료하고 안전하게 저장한 뒤 종료합니다...")
+
 if __name__ == "__main__":
     n = 32                 
     max_limit = 32         
-    total_simulations = 100  # 추출할 데이터 수
     
     # 2가지 전략 비교 설정
     strategies = [
@@ -24,35 +35,46 @@ if __name__ == "__main__":
         "Spawn_Fail_Count", "Backtrack_Count", "Total_Spawned", "Success"
     ]
     
-    # CSV 파일 열기 및 헤더 작성
-    with open(csv_filename, mode="w", newline="", encoding="utf-8") as file:
+    # 💡 파일이 이미 존재하는지 확인
+    file_exists = os.path.isfile(csv_filename)
+    
+    # 💡 mode="a" (Append)로 변경하여 기존 내용을 보존
+    with open(csv_filename, mode="a", newline="", encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
-        writer.writeheader()
         
-        print(f"데이터 추출 시작... (총 {total_simulations * len(strategies)}회 실행)")
+        # 💡 파일이 처음 만들어질 때(새 파일일 때)만 헤더를 작성
+        if not file_exists:
+            writer.writeheader()
         
-        for i in range(total_simulations):
-            # 두 전략이 완벽히 동일한 환경(지형, 목표 위치)에서 대결할 수 있도록 시드를 고정
+        print("🚀 데이터 추출 시작... (종료하려면 터미널에서 '엔터(Enter)' 키를 누르세요!)")
+        
+        # 입력을 대기하는 스레드를 백그라운드(daemon)로 실행
+        exit_thread = threading.Thread(target=wait_for_exit, daemon=True)
+        exit_thread.start()
+        
+        simulation_count = 0
+        
+        # 무한 루프 대신 플래그 상태를 확인하며 반복
+        while keep_running:
             current_seed = random.randint(100000, 999999)
             
             for strategy in strategies:
-                random.seed(current_seed) # 시드 고정
+                random.seed(current_seed) 
                 
-                # 맵 생성 및 배치
                 maze_env = Maze(n, num_initial_drones=strategy["count"])
                 
-                # 시뮬레이터 가동 (visualize=False로 화면 출력 없이 고속 연산)
                 sim = Simulator(maze_env, max_drones=max_limit, 
                                 seed_value=current_seed, 
                                 strategy_name=strategy["name"])
                 
                 result_data = sim.run(visualize=False)
-                
-                # 결과 CSV에 행 추가
                 writer.writerow(result_data)
                 
-            # 진행률 표시
-            if (i + 1) % 10 == 0:
-                print(f"진행 상황: {i + 1} / {total_simulations} 세트 완료")
-                
-    print(f"\n✅ 시뮬레이션 종료! 데이터가 '{csv_filename}'에 성공적으로 저장되었습니다.")
+            file.flush() 
+            simulation_count += 1
+            
+            # 종료 신호가 들어오지 않았을 때만 진행률 출력
+            if simulation_count % 10 == 0 and keep_running:
+                print(f"진행 상황: {simulation_count} 세트 완료 (현재까지 총 {simulation_count * len(strategies)}줄 기록됨)")
+                    
+    print(f"\n✅ 안전하게 종료되었습니다! 총 {simulation_count} 세트(데이터 {simulation_count * len(strategies)}개)가 '{csv_filename}'에 완벽하게 보존되었습니다.")
