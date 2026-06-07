@@ -4,7 +4,7 @@ from utils import get_maze_path_distance
 from drone import Drone
 
 class Simulator:
-    def __init__(self, maze_obj, max_drones=32, seed_value=None, strategy_name="Single"):
+    def __init__(self, maze_obj, max_drones=32, seed_value=None, strategy_name=1):
         self.maze_data = maze_obj.maze
         self.goal_location = maze_obj.g_location
         self.max_drones = max_drones

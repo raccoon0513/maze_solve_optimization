@@ -23,7 +23,7 @@ if __name__ == "__main__":
     max_limit = 32         
     
     # 1, 2, 4, 8, 16, 32 단위로 테스트하는 전략 리스트
-    strategies = [{"name": f"{i}_Spawn", "count": i} for i in [1, 2, 4, 8, 16, 32]]
+    strategies = [{"name": i, "count": i} for i in [1, 2, 4, 8, 16, 32]]
     
     csv_filename = "simulation_results.csv"
     
