@@ -36,6 +36,13 @@
         1. 2는 플레이어<sub>PP : Player</sub>
         1. 3은 목적지<sub>GG : Goal</sub>
 2. 하향식 접근
+    1. 알고리즘 선택
+        1. 좌수법/우수법
+        1. DFS<sub>Death First Search</sub>
+        1. BFS<sub>Breadth First Search</sub>
+        1. D* lite
+        1. 휴리스틱 병렬 DFS <sub>Heuristic Parrellel DFS</sub>
+    
 
 
 ## 연구 결과
