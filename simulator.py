@@ -11,6 +11,9 @@ class Simulator:
         self.seed_value = seed_value
         self.strategy_name = strategy_name
         
+        # 💡 [추가된 부분] 초기 드론들의 좌표 리스트를 저장해 둡니다.
+        self.initial_d_locations = maze_obj.d_locations
+        
         self.ticks = 0
         self.is_cleared = False
         self.winner = None
@@ -111,6 +114,7 @@ class Simulator:
         return {
             "Seed": self.seed_value,
             "Spawn_Strategy": self.strategy_name,
+            "Initial_Drones_XY": str(self.initial_d_locations), # 💡 [추가된 부분] 초기 좌표 리스트를 문자열로 변환하여 저장
             "Goal_X": self.goal_location[0],
             "Goal_Y": self.goal_location[1],
             "Optimal_Tick": self.optimal_path_distance,

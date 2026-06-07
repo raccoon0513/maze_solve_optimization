@@ -26,8 +26,10 @@ if __name__ == "__main__":
     strategies = [{"name": f"{i}_Spawn", "count": i} for i in [1, 2, 4, 8, 16, 32]]
     
     csv_filename = "simulation_results.csv"
+    
+    # 💡 [수정된 부분] fieldnames에 "Initial_Drones_XY" 칼럼 추가
     fieldnames = [
-        "Seed", "Spawn_Strategy", "Goal_X", "Goal_Y", 
+        "Seed", "Spawn_Strategy", "Initial_Drones_XY", "Goal_X", "Goal_Y", 
         "Optimal_Tick", "Used_Tick", "Map_Coverage_%", 
         "Spawn_Fail_Count", "Backtrack_Count", "Total_Spawned", "Success"
     ]
