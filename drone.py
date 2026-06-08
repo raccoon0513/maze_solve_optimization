@@ -24,7 +24,6 @@ class Drone:
             env.clear(winner_id=self.id)
             return
 
-        # 백트래킹(되돌아가기) 실행 시 카운트 증가
         if self.memory['is_backtracking']:
             target = self.memory['missed_branches'][-1]
             if (self.x, self.y) == (target[0], target[1]):
@@ -44,7 +43,6 @@ class Drone:
             if d != came_from and env.can_move(self.x, self.y, d):
                 open_dirs.append(d)
 
-        # 막다른 길에 갇혀 백트래킹을 시작할 때 카운트 증가
         if len(open_dirs) == 0:
             if len(self.memory['missed_branches']) > 0:
                 self.memory['is_backtracking'] = True
@@ -56,11 +54,12 @@ class Drone:
             return
 
         gx, gy = env.goal_location
-        open_dirs.sort(key=lambda d: manhattan_distance(self.x + d[0]*2, self.y + d[1]*2, gx, gy))
+        # 더 이상 *2를 하지 않고 바로 인접 칸으로 계산
+        open_dirs.sort(key=lambda d: manhattan_distance(self.x + d[0], self.y + d[1], gx, gy))
 
         for d in open_dirs[1:]:
-            new_x = self.x + d[0] * 2
-            new_y = self.y + d[1] * 2
+            new_x = self.x + d[0]
+            new_y = self.y + d[1]
             
             new_memory = {
                 'came_from': get_opposite(d),

@@ -19,13 +19,11 @@ def get_maze_path_distance(maze_data, start_loc, goal_loc):
         if (x, y) == goal_loc:
             return dist
 
-        for dx, dy in DIRECTIONS:
-            wall_x, wall_y = x + dx, y + dy
-            next_x, next_y = x + 2 * dx, y + 2 * dy
-
-            if 0 <= next_x < len(maze_data) and 0 <= next_y < len(maze_data[0]):
-                if maze_data[wall_x][wall_y] == 1 and (next_x, next_y) not in visited:
-                    visited.add((next_x, next_y))
-                    queue.append((next_x, next_y, dist + 1))
+        # maze_data[x][y] 안에는 현재 위치에서 이동 가능한 방향(dx, dy) 리스트가 들어있음
+        for dx, dy in maze_data[x][y]:
+            next_x, next_y = x + dx, y + dy
+            if (next_x, next_y) not in visited:
+                visited.add((next_x, next_y))
+                queue.append((next_x, next_y, dist + 1))
                     
     return -1

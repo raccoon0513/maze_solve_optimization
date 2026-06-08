@@ -4,34 +4,33 @@ from utils import get_maze_path_distance
 from drone import Drone
 
 class Simulator:
-    def __init__(self, maze_obj, max_drones=32, seed_value=None, strategy_name=1):
+    def __init__(self, maze_obj, max_drones=32, seed_value=None, strategy_name="Single"):
+        self.n = maze_obj.n
         self.maze_data = maze_obj.maze
         self.goal_location = maze_obj.g_location
         self.max_drones = max_drones
         self.seed_value = seed_value
         self.strategy_name = strategy_name
         
-        # 💡 [추가된 부분] 초기 드론들의 좌표 리스트를 저장해 둡니다.
         self.initial_d_locations = maze_obj.d_locations
         
         self.ticks = 0
         self.is_cleared = False
         self.winner = None
         
-        # 데이터 추적용 변수
         self.spawn_fail_count = 0
         self.backtrack_count = 0
         self.total_spawned_drones = len(maze_obj.d_locations)
         
-        # 탐색률(Coverage) 계산을 위한 전체 길 개수 파악
-        self.total_path_cells = sum(row.count(1) for row in self.maze_data)
+        # 탐색률 분모가 이제 완벽하게 n * n 으로 고정됨
+        self.total_path_cells = self.n * self.n
         self.visited_cells = set()
         
         distances = []
         for d_loc in maze_obj.d_locations:
             dist = get_maze_path_distance(self.maze_data, d_loc, self.goal_location)
             distances.append(dist)
-            self.visited_cells.add((d_loc[0], d_loc[1])) # 초기 위치 방문 처리
+            self.visited_cells.add((d_loc[0], d_loc[1])) 
             
         self.optimal_path_distance = min(distances) if distances else 0
         
@@ -41,23 +40,18 @@ class Simulator:
             self.drones.append(new_drone)
 
     def can_move(self, x, y, d):
-        wall_x = x + d[0]
-        wall_y = y + d[1]
-        return self.maze_data[wall_x][wall_y] == 1
+        # 얇은 벽 검사: 가고자 하는 방향 d가 현재 방의 '뚫린 방향 리스트' 안에 있는가?
+        return d in self.maze_data[x][y]
 
     def move(self, drone, d):
-        # 이동 시 벽(중간 칸)과 도착 방(끝 칸)을 모두 방문 기록에 추가
-        wall_x, wall_y = drone.x + d[0], drone.y + d[1]
-        drone.x += d[0] * 2
-        drone.y += d[1] * 2
-        
-        self.visited_cells.add((wall_x, wall_y))
+        drone.x += d[0]
+        drone.y += d[1]
         self.visited_cells.add((drone.x, drone.y))
 
     def spawn_drone(self, x, y, memory):
         active_count = sum(1 for d in self.drones if d.active)
         if active_count >= self.max_drones:
-            self.spawn_fail_count += 1  # 제한 초과 시 실패 기록
+            self.spawn_fail_count += 1
             return False
             
         new_id = len(self.drones)
@@ -74,21 +68,40 @@ class Simulator:
 
     def render(self):
         os.system('cls' if os.name == 'nt' else 'clear')
-        path_char, wall_char, goal_char = "  ", "▓▓", "GG"
         active_drones = [d for d in self.drones if d.active]
         gx, gy = self.goal_location
         
         print(f"--- 틱: {self.ticks} | 활성 드론: {len(active_drones)}/{self.max_drones} ---")
-        for r in range(len(self.maze_data)):
-            line = ""
-            for c in range(len(self.maze_data[r])):
+        
+        for r in range(self.n):
+            # 1. 방 위의 천장(북쪽 벽) 선 그리기
+            top_line = "+"
+            for c in range(self.n):
+                if (-1, 0) in self.maze_data[r][c]:
+                    top_line += "   +" # 북쪽이 뚫려있음
+                else:
+                    top_line += "---+" # 북쪽이 막혀있음
+            print(top_line)
+            
+            # 2. 방 안쪽 내용 및 좌측(서쪽) 벽 그리기
+            room_line = ""
+            for c in range(self.n):
+                if (0, -1) in self.maze_data[r][c]:
+                    room_line += " "   # 서쪽이 뚫려있음
+                else:
+                    room_line += "|"   # 서쪽이 막혀있음
+                    
                 drones_on_cell = sum(1 for d in active_drones if d.x == r and d.y == c)
-                if drones_on_cell == 1: line += "DR"
-                elif drones_on_cell > 1: line += f"{drones_on_cell:02d}" 
-                elif r == gx and c == gy: line += goal_char
-                elif self.maze_data[r][c] == 1: line += path_char
-                else: line += wall_char
-            print(line)
+                if drones_on_cell == 1: room_line += " D "
+                elif drones_on_cell > 1: room_line += f"{drones_on_cell:02d} "
+                elif r == gx and c == gy: room_line += " G "
+                else: room_line += "   "
+                
+            room_line += "|" # 가장 오른쪽 닫는 벽
+            print(room_line)
+            
+        # 3. 미로 가장 아랫단 닫는 벽
+        print("+" + "---+" * self.n)
         time.sleep(0.05)
 
     def run(self, visualize=False):
@@ -107,14 +120,12 @@ class Simulator:
                     if visualize: self.render()
                     break
         
-        # 탐색률 계산 (%)
         coverage_percent = round((len(self.visited_cells) / self.total_path_cells) * 100, 2)
         
-        # CSV에 기록할 딕셔너리 반환
         return {
             "Seed": self.seed_value,
             "Spawn_Strategy": self.strategy_name,
-            "Initial_Drones_XY": str(self.initial_d_locations), # 💡 [추가된 부분] 초기 좌표 리스트를 문자열로 변환하여 저장
+            "Initial_Drones_XY": str(self.initial_d_locations),
             "Goal_X": self.goal_location[0],
             "Goal_Y": self.goal_location[1],
             "Optimal_Tick": self.optimal_path_distance,
