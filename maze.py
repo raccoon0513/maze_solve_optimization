@@ -7,18 +7,17 @@ class Maze:
         self.maze, self.d_locations, self.g_location = self.generate_maze(n, num_initial_drones)
         
     def generate_maze(self, n, num_initial_drones):
-        # 각 방에 이동 가능한 방향(dx, dy)을 담을 빈 리스트를 생성 (얇은 벽 구현)
         maze = [[[] for _ in range(n)] for _ in range(n)]
         visited = [[False for _ in range(n)] for _ in range(n)]
-        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
         
         def backtrack(r, c):
             visited[r][c] = True
-            random.shuffle(directions)
-            for dr, dc in directions:
+            local_directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+            random.shuffle(local_directions)
+            
+            for dr, dc in local_directions:
                 nr, nc = r + dr, c + dc
                 if 0 <= nr < n and 0 <= nc < n and not visited[nr][nc]:
-                    # 벽을 허물고 양방향으로 길을 연결
                     maze[r][c].append((dr, dc))
                     maze[nr][nc].append((-dr, -dc))
                     backtrack(nr, nc)    
