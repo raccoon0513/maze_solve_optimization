@@ -1,7 +1,11 @@
 # Abstract
+<img src="res/logo.jpg">
+
 본 연구는 steam에서 판매 중인 게임 "**농부는 대체되었다**<sub>The Farmer Was Replaced</sub>"에 등장하는 미로 탐색 문제를 효율적으로 풀기 위해 하향식 접근을 통한 알고리즘 최적화<sub>optimization</sub>에 목적을 둔다.
 
 # 연구 배경
+<img  src="res/ingame.jpg">
+
 게임 "**농부는 대체되었다**"에서는 랜덤으로 미로를 생성 후 탐색하여 보물을 발견함으로 자원을 얻는 방법이 있다. 
 
 커뮤니티에서 이 미로 문제를 최적화 하는 방법으로 여러 방법이 있지만, A* 알고리즘을 흉내 낸 드론 한 대에서 시작하는 병렬 탐색이 가장 빠른 알고리즘이라고 정설처럼 전해져왔다. 본 연구에서는 보다 나은 알고리즘을 탐색하고 최적화 된 초기 드론 개수를 통찰한다.
@@ -167,7 +171,7 @@
             Dep. Variable:              Used_Tick   R-squared:                       0.443
             Model:                            OLS   Adj. R-squared:                  0.443
             Method:                 Least Squares   F-statistic:                 1.468e+05
-            Date:       Used_tick<sup>사용된 틱 수</sup>를 기반한 ANOVA<sup>일원 분산 분석</sup> 결과         Sat, 13 Jun 2026   Prob (F-statistic):               0.00
+            Date:                Sat, 13 Jun 2026   Prob (F-statistic):               0.00
             Time:                        18:14:50   Log-Likelihood:            -5.0856e+06
             No. Observations:              920802   AIC:                         1.017e+07
             Df Residuals:                  920796   BIC:                         1.017e+07
